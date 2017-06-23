@@ -357,7 +357,7 @@ int AddBCDInt(const Byte* ANum1, int ASize1, const Byte* ANum2, int ASize2,
 	{
 		for (int i = MinSize; i < MaxSize; i++)
 		{
-			--pDest,pNum1--;
+			--pDest,--pNum1;
 			Tmp = (*pNum1 & 0x0F) + CarryFlag;
 			if (Tmp > 9)
 			{
