@@ -182,6 +182,7 @@
 #include <iostream>
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
 using namespace std;
 typedef unsigned char Byte;
 int AddBCDInt(const Byte* ANum1, int ASize1, const Byte* ANum2, int ASize2,
@@ -189,9 +190,9 @@ int AddBCDInt(const Byte* ANum1, int ASize1, const Byte* ANum2, int ASize2,
 int main()
 {
 	Byte arrNum1[] =
-	{ 0x00, 0x00, 0x12, 0x34, 0x56, 0x78, 0x90, 0x12, 0x34 };
+	{             0x00, 0x00, 0x12, 0x34, 0x56, 0x78, 0x90, 0x12, 0x34 };
 	Byte arrNum2[] =
-	{ 0x09, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x87, 0x65, 0x43, 0x21 };
+	{ 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x87, 0x65, 0x43, 0x21 };
 	const int ResultLength = 30;
 	Byte arrDest[ResultLength];
 	int Size1 = sizeof(arrNum1) / sizeof(Byte);
@@ -200,7 +201,7 @@ int main()
 	printf("%d\n", Ret);
 	for (int i = 0; i < Ret; i++)
 	{
-		printf("%02x", arrDest[i]);
+		printf("%02x ", arrDest[i]);
 	}
 	return 0;
 }
@@ -328,7 +329,7 @@ int AddBCDInt(const Byte* ANum1, int ASize1, const Byte* ANum2, int ASize2,
 	for (int i = 0; i < MinSize; i++)
 	{
 		--pDest, --pNum1, --pNum2;
-		Tmp = (*pNum1 & 0x0F) +  (*pNum2 & 0x0F) + CarryFlag;
+		Tmp = (*pNum1 & 0x0F) + (*pNum2 & 0x0F) + CarryFlag;
 		if (Tmp > 9)
 		{
 			*pDest = Tmp - 10;
@@ -351,5 +352,71 @@ int AddBCDInt(const Byte* ANum1, int ASize1, const Byte* ANum2, int ASize2,
 			CarryFlag = 0;
 		}
 	}
+
+	if (Size1 > Size2)
+	{
+		for (int i = MinSize; i < MaxSize; i++)
+		{
+			--pDest,pNum1--;
+			Tmp = (*pNum1 & 0x0F) + CarryFlag;
+			if (Tmp > 9)
+			{
+				*pDest = Tmp - 10;
+				CarryFlag = 1;
+			}else
+			{
+				*pDest = Tmp;
+				CarryFlag = 0;
+			}
+
+			Tmp = (*pNum1 >> 4) + CarryFlag;
+			if (Tmp > 9)
+			{
+				*pDest |= (Tmp - 10) << 4;
+				CarryFlag = 1;
+			}else
+			{
+				*pDest |= Tmp << 4;
+				CarryFlag = 0;
+			}
+		}
+	}else if(Size1 < Size2)
+	{
+		for (int i = MinSize; i < MaxSize; i++)
+		{
+			--pDest,--pNum2;
+			Tmp = (*pNum2 & 0x0F) + CarryFlag;
+			if (Tmp > 9)
+			{
+				*pDest = Tmp - 10;
+				CarryFlag = 1;
+			}else
+			{
+				*pDest = Tmp;
+				CarryFlag = 0;
+			}
+
+			Tmp = (*pNum2 >> 4) + CarryFlag;
+			if (Tmp > 9)
+			{
+				*pDest |= (Tmp - 10) << 4;
+				CarryFlag = 1;
+			}else
+			{
+				*pDest |= Tmp << 4;
+				CarryFlag = 0;
+			}
+		}
+	}
+
+	if (1 == CarryFlag)
+	{
+		memmove(ADest+1,pDest,ResultLength);
+		*ADest = 1;
+		ResultLength++;
+	}
 	return ResultLength;
 }
+/*
+ * 10 00 00 00 12345666555555
+ */
