@@ -7,7 +7,7 @@
  * 注意事项：无
  * 修订记录：
  * 		2017/6/17		孙兴			创建文件
- * 		2017/6/23		孙兴			进行模块化，命名标准化
+ * 		2017/6/23		孙兴			进行模块化，命名标准化,算法重写
  */
 #include <iostream>
 #include <cstdio>
@@ -32,9 +32,7 @@ int main()
 	int intRet = AddBCDInt(arrNum1, intSize1, arrNum2, intSize2, arrDest, intResultLength);
 	printf("%d\n", intRet);
 	for (int i = 0; i < intRet; i++)
-	{
 		printf("%02x ", arrDest[i]);
-	}
 	return 0;
 }
 
@@ -53,34 +51,13 @@ int AddBCDInt(const Byte* ANum1, int ASize1, const Byte* ANum2, int ASize2, Byte
 	int intCarryFlag = 0;		// 进位标识
 
 	int intTmp = L_CheckCharactor(ANum1, ASize1);
-	if (-1 == intTmp)
-	{
-		return -3;
-	}
-	else if (-2 == intTmp)
-	{
-		return -1;
-	}
+	if (-2 == intTmp) return -1;
 	intTmp = L_CheckCharactor(ANum2, ASize2);
-	if (-1 == intTmp)
-	{
-		return -3;
-	}
-	else if (-2 == intTmp)
-	{
-		return -2;
-	}
-
+	if (-2 == intTmp) return -2;
 	intTmp = L_ClearPreZero(ANum1, ASize1, &pNum1, &intSize1);
-	if (-1 == intTmp)
-	{
-		return -3;
-	}
+	if (-1 == intTmp) return -3;
 	intTmp = L_ClearPreZero(ANum2, ASize2, &pNum2, &intSize2);
-	if (-1 == intTmp)
-	{
-		return -3;
-	}
+	if (-1 == intTmp) return -3;
 
 	int intMinSize = intSize1;
 	int intMaxSize = intSize2;
@@ -94,17 +71,10 @@ int AddBCDInt(const Byte* ANum1, int ASize1, const Byte* ANum2, int ASize2, Byte
 	else if (intSize1 == intSize2)
 	{
 		intTmp = (*pNum1 >> 4) + (*pNum2 >> 4);
-		if (intTmp > 0x99)
-		{
-			intResultLength++;
-		}
+		if (intTmp > 0x99) intResultLength++;
 	}
 
-	if (ASize < intMaxSize)
-	{
-		return 0;
-	}
-
+	if (ASize < intMaxSize)	return 0;
 	Byte* pDest = ADest;
 	pDest += intResultLength;
 	pNum1 += intSize1;
@@ -156,9 +126,7 @@ int AddBCDInt(const Byte* ANum1, int ASize1, const Byte* ANum2, int ASize2, Byte
 static int L_CheckCharactor(const Byte* ANum, int ASize)
 {
 	if (NULL == ANum || ASize <= 0)
-	{
 		return -1;
-	}
 //	int intHighFourBits = 0;
 //	int intLowFourBits = 0;
 	while (ASize--)
@@ -189,9 +157,7 @@ static int L_CheckCharactor(const Byte* ANum, int ASize)
 static int L_ClearPreZero(const Byte* ANum, int ASize, const Byte** ANumOut, int* ASizeOut)
 {
 	if (NULL == ANum || ASize <= 0 || NULL == ANumOut || NULL == ASizeOut)
-	{
 		return -1;
-	}
 	while (ASize--)
 	{
 		if (0 != *ANum)
@@ -200,10 +166,7 @@ static int L_ClearPreZero(const Byte* ANum, int ASize, const Byte** ANumOut, int
 			*ASizeOut = ASize + 1;
 			return 0;
 		}
-		else
-		{
-			ANum++;
-		}
+		else ANum++;
 	}
 	return 0;
 }
@@ -224,9 +187,7 @@ static int L_ClearPreZero(const Byte* ANum, int ASize, const Byte** ANumOut, int
 static inline int L_AddTwoBCD(Byte ANum1, Byte ANum2, Byte* ADest, int* ACarryFlag)
 {
 	if (NULL == ADest || NULL == ACarryFlag)
-	{
 		return -1;
-	}
 	int intTmp = (ANum1 & 0x0F) + (ANum2 & 0x0F) + *ACarryFlag;
 	if (intTmp > 9)
 	{
