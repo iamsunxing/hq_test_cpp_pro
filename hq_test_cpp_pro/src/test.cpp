@@ -15,14 +15,16 @@
 #include <cstring>
 using namespace std;
 typedef unsigned char Byte;
+// 函数声明
 static inline int L_AddTwoBCD(Byte ANum1, Byte ANum2, Byte* ADest, int* ACarryFlag);
 static int L_CheckCharactor(const Byte* ANum, int ASize);
 static int L_ClearPreZero(const Byte* ANum, int ASize, const Byte** ANumOut, int* ASizeOut);
 int AddBCDInt(const Byte* ANum1, int ASize1, const Byte* ANum2, int ASize2, Byte* ADest, int ASize);
+
 int main()
 {
-	Byte arrNum1[] = { 0x00, 0x00, 0x12, 0x34, 0x56, 0x78, 0x90, 0x12, 0x34 };
-	Byte arrNum2[] = { 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x87, 0x65, 0x43, 0x21 };
+	Byte arrNum1[] = { 0x90, 0x00, 0x00, 0x00, 0x12, 0x34, 0x56, 0x78, 0x90, 0x12, 0x34 };
+	Byte arrNum2[] = { 0x09, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x87, 0x65, 0x43, 0x21 };
 	const int intResultLength = 30;
 	Byte arrDest[intResultLength];
 	int intSize1 = sizeof(arrNum1) / sizeof(Byte);
@@ -216,7 +218,8 @@ static int L_ClearPreZero(const Byte* ANum, int ASize, const Byte** ANumOut, int
  *       -1  参数不合法
  *       0   正常结束
  * 备注：
- * 		 无
+ * 		 由于此函数调用频繁，声明为inline暗示编译器在函数调用处直接插入汇编代码，
+ * 		 减少函数频繁调用的时间上的开销。
  */
 static inline int L_AddTwoBCD(Byte ANum1, Byte ANum2, Byte* ADest, int* ACarryFlag)
 {
