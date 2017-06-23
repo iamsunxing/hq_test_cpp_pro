@@ -18,23 +18,18 @@ typedef unsigned char Byte;
 
 static int L_AddTwoBCD(Byte ANum1, Byte ANum2, Byte* ADest, int* ACarryFlag);
 static int L_CheckCharactor(const Byte* ANum, int ASize);
-static int L_ClearPreZero(const Byte* ANum, int ASize, const Byte** ANumOut,
-		int* ASizeOut);
-int AddBCDInt(const Byte* ANum1, int ASize1, const Byte* ANum2, int ASize2,
-		Byte* ADest, int ASize);
+static int L_ClearPreZero(const Byte* ANum, int ASize, const Byte** ANumOut, int* ASizeOut);
+int AddBCDInt(const Byte* ANum1, int ASize1, const Byte* ANum2, int ASize2, Byte* ADest, int ASize);
 
 int main()
 {
-	Byte arrNum1[] =
-	{ 0x00, 0x00, 0x00, 0x00, 0x12, 0x34, 0x56, 0x78, 0x90, 0x12, 0x34 };
-	Byte arrNum2[] =
-	{ 0x09, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x87, 0x65, 0x43, 0x21 };
+	Byte arrNum1[] = { 0x00, 0x00, 0x00, 0x00, 0x12, 0x34, 0x56, 0x78, 0x90, 0x12, 0x34 };
+	Byte arrNum2[] = { 0x09, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x87, 0x65, 0x43, 0x21 };
 	const int intResultLength = 30;
 	Byte arrDest[intResultLength];
 	int intSize1 = sizeof(arrNum1) / sizeof(Byte);
 	int intSize2 = sizeof(arrNum2) / sizeof(Byte);
-	int intRet = AddBCDInt(arrNum1, intSize1, arrNum2, intSize2, arrDest,
-			intResultLength);
+	int intRet = AddBCDInt(arrNum1, intSize1, arrNum2, intSize2, arrDest, intResultLength);
 	printf("%d\n", intRet);
 	for (int i = 0; i < intRet; i++)
 	{
@@ -53,10 +48,10 @@ int AddBCDInt(const Byte* ANum1, int ASize1, const Byte* ANum2, int ASize2,
 		return -3;
 	}
 
-	const Byte* pNum1 = NULL;   // 指向ASize1的第一个非0字节
-	const Byte* pNum2 = NULL;   // 指向ASize2的第一个非0字节
-	int intSize1 = 0;			// 从pNum1开始的字节数
-	int intSize2 = 0;			// 从pNum1开始的字节数
+	const Byte* pNum1 = NULL;   // 用来存储指向ASize1的第一个非0字节的地址
+	const Byte* pNum2 = NULL;   // 用来存储指向ASize2的第一个非0字节的地址
+	int intSize1 = 0;			// 用来存储从pNum1开始的字节数
+	int intSize2 = 0;			// 用来存储从pNum1开始的字节数
 	int intCarryFlag = 0;		// 进位标识
 
 	int intTmp = L_CheckCharactor(ANum1, ASize1);
@@ -90,7 +85,10 @@ int AddBCDInt(const Byte* ANum1, int ASize1, const Byte* ANum2, int ASize2,
 	}
 
 	if (ASize < intMaxSize)
+	{
 		return 0;
+	}
+
 	Byte* pDest = ADest;
 	pDest += intResultLength;
 	pNum1 += intSize1;
@@ -187,10 +185,7 @@ static int L_ClearPreZero(const Byte* ANum, int ASize, const Byte** ANumOut,
 			*ASizeOut = ASize + 1;
 			return 0;
 		}
-		else
-		{
-			ANum++;
-		}
+		ANum++;
 	}
 	return 0;
 }
