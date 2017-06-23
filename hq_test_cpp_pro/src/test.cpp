@@ -192,12 +192,11 @@ int main()
 	{ 0x00, 0x00, 0x12, 0x34, 0x56, 0x78, 0x90, 0x12, 0x34 };
 	Byte arrNum2[] =
 	{ 0x09, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x87, 0x65, 0x43, 0x21 };
-	const int DestLength = 30;
-	Byte arrDest[DestLength];
-	int Num1Size = sizeof(arrNum1) / sizeof(Byte);
-	int Num2Size = sizeof(arrNum2) / sizeof(Byte);
-	int Ret = AddBCDInt(arrNum1, Num1Size, arrNum2, Num2Size, arrDest,
-			DestLength);
+	const int ResultLength = 30;
+	Byte arrDest[ResultLength];
+	int Size1 = sizeof(arrNum1) / sizeof(Byte);
+	int Size2 = sizeof(arrNum2) / sizeof(Byte);
+	int Ret = AddBCDInt(arrNum1, Size1, arrNum2, Size2, arrDest, ResultLength);
 	printf("%d\n", Ret);
 	for (int i = 0; i < Ret; i++)
 	{
@@ -206,7 +205,7 @@ int main()
 	return 0;
 }
 /**
- * 检查是否有非法字符
+ * 功能：检查是否有非法字符
  * 参数不合法返回 -1
  * 有非法字符返回 -2
  * 否则正常返回       0
@@ -217,19 +216,22 @@ static int L_CheckCharactor(const Byte* ANum, int ASize)
 	{
 		return -1;
 	}
-	for (int i = 0, HighFourBits = 0, LowFourBits = 0; i < ASize; i++)
+	int HighFourBits = 0;
+	int LowFourBits = 0;
+	while (ASize--)
 	{
-		HighFourBits = ANum[i] >> 4;
-		LowFourBits = ANum[i] & 0x0F;
+		HighFourBits = *ANum >> 4;
+		LowFourBits = *ANum & 0x0F;
 		if (HighFourBits > 9 || LowFourBits > 9)
 		{
 			return -2;
 		}
+		ANum++;
 	}
 	return 0;
 }
 /**
- * 去掉前面可能存在的0
+ * 功能：去掉前面可能存在的0
  * 参数不合法返回 -1
  * 否则正常返回      0
  */
@@ -244,8 +246,8 @@ static int L_ClearPreZero(const Byte* ANum, int ASize, const Byte** ANumOut,
 	{
 		if (0 != *ANum)
 		{
-			ANumOut = &ANum;
-			*ASizeOut = ASize;
+			*ANumOut = ANum;
+			*ASizeOut = ASize + 1;
 			return 0;
 		}
 		else
@@ -299,28 +301,34 @@ int AddBCDInt(const Byte* ANum1, int ASize1, const Byte* ANum2, int ASize2,
 		return -3;
 	}
 
-	int MinSize = 0;
-	int MaxSize = 0;
+	int CarryFlag = 0;
+
+	pNum1 += Size1;
+	pNum2 += Size2;
+
+	int MinSize = Size1;
+	int MaxSize = Size2;
+	int ResultLength = Size2;
 	if (Size1 > Size2)
 	{
 		MinSize = Size2;
 		MaxSize = Size1;
+		ResultLength = Size1;
 	}
-	else
+	else if (Size1 == Size2)
 	{
-		MinSize = Size1;
-		MaxSize = Size2;
+		Tmp = (*pNum1 >> 4) + (*pNum2 >> 4);
+		if (Tmp > 0x99)
+		{
+			ResultLength++;
+		}
 	}
-
-	int CarryFlag = 0;
 	Byte* pDest = ADest;
-	pDest += ASize;
-	pNum1 += Size1;
-	pNum2 += Size2;
+	pDest += ResultLength;
 	for (int i = 0; i < MinSize; i++)
 	{
 		--pDest, --pNum1, --pNum2;
-		Tmp = *pNum1 & 0x0F + *pNum2 & 0x0F + CarryFlag;
+		Tmp = (*pNum1 & 0x0F) +  (*pNum2 & 0x0F) + CarryFlag;
 		if (Tmp > 9)
 		{
 			*pDest = Tmp - 10;
@@ -331,6 +339,17 @@ int AddBCDInt(const Byte* ANum1, int ASize1, const Byte* ANum2, int ASize2,
 			*pDest = Tmp;
 			CarryFlag = 0;
 		}
-
+		Tmp = (*pNum1 >> 4) + (*pNum2 >> 4) + CarryFlag;
+		if (Tmp > 9)
+		{
+			*pDest |= (Tmp - 10) << 4;
+			CarryFlag = 1;
+		}
+		else
+		{
+			*pDest |= Tmp << 4;
+			CarryFlag = 0;
+		}
 	}
+	return ResultLength;
 }
