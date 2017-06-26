@@ -121,7 +121,7 @@ int AddBCDInt(const Byte* ANum1, int ASize1, const Byte* ANum2, int ASize2, Byte
 *       false 存在非法值
 *       true  正常结束
 * 备注：
-* 		 无
+*       无
 */
 static bool L_CheckCharactor(const Byte* ANum, int ASize)
 {
@@ -142,7 +142,7 @@ static bool L_CheckCharactor(const Byte* ANum, int ASize)
  * 返回：
  *       表示第一个非0字节的地址
  * 备注：
- * 		 无
+ *       无
  */
 static const Byte* L_ClearPreZero(const Byte* ANum, int ASize, int& ASizeOut)
 {
