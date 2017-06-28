@@ -21,7 +21,7 @@ static bool L_CheckCharactor(const Byte* ANum, int ASize);
 static const Byte* L_ClearPreZero(const Byte* ANum, int ASize, int& ASizeOut);
 int AddBCDInt(const Byte* ANum1, int ASize1, const Byte* ANum2, int ASize2, Byte* ADest, int ASize);
 
-int main()
+int main0()
 {
     Byte arrNum1[] = { 0x00, 0x00, 0x00, 0x00, 0x12, 0x34, 0x56, 0x78, 0x90, 0x12, 0x34 };
     Byte arrNum2[] = { 0x09, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x87, 0x65, 0x43, 0x21 };
